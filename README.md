@@ -1,2 +1,51 @@
 # allwinner-image-tool
-Utility to modify Allwinner firmware images
+Utility to modify Allwinner firmware images. This set of tools can be used to modify wallpapers, boot logos and other firmware assets in car radios such as those from SJoyBring and PLZ.
+
+## The tools are as follows:
+**allwinner_imagewty.py** - Extract and replace disk images from ImageWTY firmware bundles.
+
+**allwinner_minfs.py** - List, extract and replace files in a MinFS disk image.
+
+## The following steps demonstrate how to use the tools:
+
+### Step 1: Extract the user data disk image from your firmware bundle.
+`python ./allwinner_imagewty.py update/LTTF133.img --list`
+
+`python ./allwinner_imagewty.py update/LTTF133.img --extract data_udisk.fex --verbose`
+
+### Step 2: Identify and optionally extract your files to replace
+`python ./allwinner_minfs.py data_udisk.fex --list`
+
+`python ./allwinner_minfs.py data_udisk.fex --extract 0.jpg`
+
+### Step 3: Replace a file in the disk image.
+`python ./allwinner_minfs.py data_udisk.fex --replace 0.jpg 0.jpg --output data_udisk.fex`
+
+### Step 4: Repackage the disk image into the firmware bundle.
+`python3 ./allwinner_imagewty.py update/LTTF133.img --verbose --replace data_udisk.fex data_udisk.fex`
+
+## Command line arguments
+
+### allwinner_imagewty.py
+
+`allwinner_imagewty.py <file> <actions>`
+
+|||
+|--------|-------|
+|`--list`| Lists all disk images in the firmware bundle. |
+|`--verbose`| Enables verbose output. |
+|`--extract <name>`| Extracts disk image by name. Filename will be same as internal disk name. |
+|`--replace <name> <filename>`| Replaces disk image by name with the contents of file. File length must match original.|
+|`--output <filename>`| Optionally specify the output of extract function. When used with replace function, it overrides the default naming (\<original name\>.modified) of the new firmware bundle. |
+
+### allwinner_minfs.py
+
+`allwinner_minfs.py <file> <actions>`
+
+|||
+|--------|-------|
+|`--list`| Lists all files in the disk image. |
+|`--verbose`| Enables verbose output. |
+|`--extract <name>`| Extracts file name. Filename will be same as internal file name. |
+|`--replace <name> <filename>`| Replaces file by name with the contents of file. |
+|`--output <filename>`| Optionally specify the filename of the modified disk image when using replace function. The default is (\<original name\>.modified). |
