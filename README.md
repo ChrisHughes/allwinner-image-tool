@@ -6,6 +6,8 @@ Utility to modify Allwinner firmware images. This set of tools can be used to mo
 
 **allwinner_minfs.py** - List, extract and replace files in a MinFS disk image.
 
+**checksum_tool.py** - Re-calculates CRC32 for a file
+
 **image_tool.py** - Re-encode jpg images into a known-compatible format.
 
 ## The following steps demonstrate how to use the tools:
@@ -15,27 +17,32 @@ Utility to modify Allwinner firmware images. This set of tools can be used to mo
 
 `python ./allwinner_imagewty.py update/LTTF133.img --extract data_udisk.fex --verbose`
 
+`python ./allwinner_imagewty.py update/LTTF133.img --extract Vdata_udisk.fex --verbose`
+
 ### Step 2: Identify and optionally extract your files to replace.
 `python ./allwinner_minfs.py data_udisk.fex --list`
 
 `python ./allwinner_minfs.py data_udisk.fex --extract 0.jpg`
 
 ### Step 3: Re-encode each jpg image into a compatible format.
-Optional, but recommended for logo / boot images.
-
+Do not skip this step as you can cause your radio to not boot if it cannot read the boot logo image.
 `python ./image_tool.py logo0.jpg logo0.jpg`
 
 ### Step 4: Replace a file in the disk image.
 `python ./allwinner_minfs.py data_udisk.fex --replace 0.jpg 0.jpg --output data_udisk.fex`
 
-### Step 5: Repackage the disk image into the firmware bundle.
-`python ./allwinner_imagewty.py update/LTTF133.img --verbose --replace data_udisk.fex data_udisk.fex`
+### Step 5: Re-calculate CRC32
+`python ./checksum_tool.py data_udisk.fex Vdata_udisk.fex`
+
+### Step 6: Repackage the disk image into the firmware bundle.
+`python ./allwinner_imagewty.py update/LTTF133.img --verbose --replace data_udisk.fex data_udisk.fex --output update/LTTF133.img`
+
+`python ./allwinner_imagewty.py update/LTTF133.img --verbose --replace Vdata_udisk.fex Vdata_udisk.fex --output update/LTTF133.img`
 
 ## Additional notes
 
 - It is recommended to replace images with images of the exact same resolution.
 - When setting boot images (called logos in some cases), these are read and interpreted by the MCU, not the application. The expected format for the jpeg is very strict, otherwise the image will fail to load. Use image_tool.py to re-encode these and make them work.
-- As the firmware bundle's disk image checksum is not updated, the update will loop and retry indefinitely, despite succeeding. Just wait until the first loop then power off the device, unplug the USB drive and power it on again to see the new firmware.
 
 ## Command line arguments
 
@@ -67,4 +74,4 @@ Optional, but recommended for logo / boot images.
 
 ## Note
 
-This tool is provided without warranty. You are on your own if you brick your device.
+This tool is provided without warranty. You are on your own if you brick your device. Backing up the SPI EEPROM before attempting is recommended, I used a CH341A and a 16 pin chip clip to do this without any soldering necessary.
