@@ -105,14 +105,14 @@ class MINFSFile:
         """Extracts file to disk"""
         file_object.print_details()
         if self.flags & FLAG_COMPRESSION:
-            raise RuntimeError("Handling compressed files not yet implemented")
+            raise RuntimeError("Compressed entries are not handled here — use melis_minfs.py")
         content = self.binary_buffer[self.flash_offset:self.flash_offset + self.raw_size]
         with open(self.name, 'wb') as file:
             file.write(content)
 
     def replace_content(self, content):
         if self.flags & FLAG_COMPRESSION:
-            raise RuntimeError("Handling compressed files not yet implemented")
+            raise RuntimeError("Compressed entries are not handled here — use melis_minfs.py")
         self.raw_size = len(content)
         self.uncompressed_size = len(content)
         self.content = content
